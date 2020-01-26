@@ -6,8 +6,8 @@
 
 <script>
   export default {
-    name: 'tiny-html-server'
-  }
+    name: 'tiny-html-server',
+  };
 </script>
 
 <style>

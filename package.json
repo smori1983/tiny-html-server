@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "vue-cli": "^2.9.6"
+  },
   "devDependencies": {},
   "author": "Shinichiro MORI",
   "license": "MIT"

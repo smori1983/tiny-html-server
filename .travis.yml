@@ -13,9 +13,5 @@ cache:
     - "$HOME/.electron"
     - "$HOME/.cache"
 
-env:
-  global:
-    NODE_ENV='production'
-
 script:
   - npm run build

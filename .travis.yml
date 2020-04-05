@@ -13,5 +13,8 @@ cache:
     - "$HOME/.electron"
     - "$HOME/.cache"
 
+env:
+  NODE_ENV='production'
+
 script:
-  - npm run build:travis
+  - npm run build

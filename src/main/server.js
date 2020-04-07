@@ -20,7 +20,7 @@ const create = function create(docRoot) {
  * @param {string} docRoot
  * @returns {Server}
  */
-const serve = function main(docRoot) {
+const serve = function serve(docRoot) {
   const server = http.createServer();
 
   server.on('request', create(docRoot));

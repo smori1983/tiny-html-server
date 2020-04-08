@@ -18,7 +18,7 @@ const createApp = function createApp(docRoot) {
 
 /**
  * @param {string} docRoot
- * @returns {Server}
+ * @returns {module:http.Server}
  */
 const serve = function serve(docRoot) {
   const server = http.createServer();

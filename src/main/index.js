@@ -1,4 +1,6 @@
-import { app, BrowserWindow } from 'electron' // eslint-disable-line
+import { app, ipcMain, BrowserWindow } from 'electron' // eslint-disable-line
+
+const server = require('./server');
 
 /**
  * Set `__static` path to static files in production
@@ -41,6 +43,26 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
+  }
+});
+
+/** @type {module:http.Server} */
+let srv;
+
+ipcMain.on('server-start', (event, args) => {
+  if (srv) {
+    srv.close();
+  }
+
+  srv = server.serve(args.directory);
+
+  event.sender.send('server-started');
+});
+
+ipcMain.on('server-stop', (event) => {
+  if (srv && srv.listening) {
+    srv.close();
+    event.sender.send('server-stopped');
   }
 });
 

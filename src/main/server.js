@@ -6,7 +6,7 @@ const http = require('http');
  * @param {string} docRoot
  * @returns {Express}
  */
-const create = function create(docRoot) {
+const createApp = function createApp(docRoot) {
   const app = express();
 
   app.use('/', express.static(fs.realpathSync(docRoot), {
@@ -23,7 +23,7 @@ const create = function create(docRoot) {
 const serve = function serve(docRoot) {
   const server = http.createServer();
 
-  server.on('request', create(docRoot));
+  server.on('request', createApp(docRoot));
   server.keepAliveTimeout = 10;
   server.listen({
     port: 3000,

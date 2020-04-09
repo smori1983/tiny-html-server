@@ -1,6 +1,6 @@
-const express = require('express');
-const fs = require('fs');
-const http = require('http');
+import express from 'express';
+import fs from 'fs';
+import http from 'http';
 
 /**
  * @param {string} docRoot
@@ -33,4 +33,4 @@ const serve = function serve(docRoot) {
   return server;
 };
 
-module.exports.serve = serve;
+export default serve;

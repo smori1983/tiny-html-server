@@ -1,6 +1,6 @@
 import { app, ipcMain, BrowserWindow } from 'electron' // eslint-disable-line
 
-const server = require('./server');
+import server from './server';
 
 /**
  * Set `__static` path to static files in production

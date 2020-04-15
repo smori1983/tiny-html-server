@@ -1,5 +1,5 @@
-import yargs from 'yargs';
-import server from './src/main/server';
+const yargs = require('yargs');
+const server = require('./src/main/server');
 
 yargs.command({
   command: ['serve <directory>', '$0'],

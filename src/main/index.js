@@ -1,4 +1,4 @@
-import { app, ipcMain, BrowserWindow } from 'electron' // eslint-disable-line
+const { app, ipcMain, BrowserWindow } = require('electron'); // eslint-disable-line
 
 const server = require('./server');
 

@@ -12,6 +12,8 @@
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
     "dev": "node .electron-vue/dev-runner.js",
     "e2e": "npm run pack && mocha test/e2e",
+    "license:generate": "node .electron-vue/license.js",
+    "license:summary": "license-checker --production --summary --unknown",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
     "pack": "npm run pack:main && npm run pack:renderer",

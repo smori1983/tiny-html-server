@@ -51,12 +51,17 @@ export default {
       }
     },
     stopServer() {
+      ipcRenderer.send('server-stop');
     },
   },
   mounted() {
     // Temporary implementation
     ipcRenderer.on('server-started', () => {
       this.log += 'started<br>';
+    });
+
+    ipcRenderer.on('server-stopped', () => {
+      this.log += 'stopped<br>';
     });
   },
 };

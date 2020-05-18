@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, ipcMain, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
   /* installVueDevtools */
@@ -87,3 +87,25 @@ if (isDevelopment) {
     })
   }
 }
+
+const server = require('./background/server')
+
+/** @type {module:http.Server} */
+let srv;
+
+ipcMain.on('server-start', (event, args) => {
+  if (srv) {
+    srv.close()
+  }
+
+  srv = server.serve(args.directory)
+
+  event.sender.send('server-started')
+})
+
+ipcMain.on('server-stop', (event) => {
+  if (srv && srv.listening) {
+    srv.close()
+    event.sender.send('server-stopped')
+  }
+})

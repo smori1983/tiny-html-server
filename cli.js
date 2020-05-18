@@ -1,5 +1,5 @@
 const yargs = require('yargs');
-const server = require('./src/main/server');
+const server = require('./src/background/server');
 
 yargs.command({
   command: ['serve <directory>', '$0'],

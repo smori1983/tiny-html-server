@@ -1,17 +1,19 @@
 <template>
-  <div>
-    <div>
-      <input v-model="directory" class="directory" type="text" placeholder="directory">
-      <button v-on:click="selectDirectory" class="" type="button">Browse</button>
-    </div>
-    <div>
-      <button v-on:click="startServer" type="button">Start</button>
-      <button v-on:click="stopServer" type="button">Stop</button>
-    </div>
-    <div>
-      <div v-html="log" class="log"></div>
-    </div>
-  </div>
+  <v-form>
+    <v-container>
+      <v-row>
+        <v-text-field v-model="directory" placeholder="directory"></v-text-field>
+        <v-btn v-on:click="selectDirectory">Browse</v-btn>
+      </v-row>
+      <v-row>
+        <v-btn v-on:click="startServer">Start</v-btn>
+        <v-btn v-on:click="stopServer">Stop</v-btn>
+      </v-row>
+      <v-row>
+        <div v-html="log" class="log"></div>
+      </v-row>
+    </v-container>
+  </v-form>
 </template>
 
 <script>

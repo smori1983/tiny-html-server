@@ -19,10 +19,12 @@
   "main": "background.js",
   "dependencies": {
     "core-js": "^3.6.4",
+    "express": "^4.17.1",
     "vue": "^2.6.11",
     "vuetify": "^2.2.11"
   },
   "devDependencies": {
+    "@types/express": "^4.17.6",
     "@types/yargs": "^15.0.5",
     "@vue/cli-plugin-babel": "~4.3.0",
     "@vue/cli-plugin-eslint": "~4.3.0",

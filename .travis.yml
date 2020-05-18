@@ -14,4 +14,4 @@ cache:
     - "$HOME/.cache"
 
 script:
-  - npm run build
+  - npm run electron:build

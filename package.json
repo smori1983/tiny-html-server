@@ -3,10 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "description": "electron app",
-  "author": {
-    "name": "smori",
-    "email": "shinichiro.mori.1983@gmail.com"
-  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -44,8 +40,9 @@
     "last 2 versions",
     "not dead"
   ],
-  "_id": "tiny-html-server@0.0.1",
-  "build": {},
-  "license": "MIT",
-  "readme": "ERROR: No README data found!"
+  "author": {
+    "name": "smori",
+    "email": "shinichiro.mori.1983@gmail.com"
+  },
+  "license": "MIT"
 }

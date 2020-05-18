@@ -8,6 +8,8 @@
     "email": "shinichiro.mori.1983@gmail.com"
   },
   "scripts": {
+    "license:generate": "node .scripts/license.js",
+    "license:summary": "license-checker --production --summary --unknown",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",

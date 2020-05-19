@@ -98,7 +98,7 @@ ipcMain.on('server-start', (event, args) => {
     srv.close()
   }
 
-  srv = server.serve(args.directory)
+  srv = server.serve(args.directory, args.port)
 
   event.sender.send('server-started')
 })

@@ -18,15 +18,16 @@ const createApp = function createApp(docRoot) {
 
 /**
  * @param {string} docRoot
+ * @param {number} [port]
  * @returns {module:http.Server}
  */
-const serve = function serve(docRoot) {
+const serve = function serve(docRoot, port) {
   const server = http.createServer();
 
   server.on('request', createApp(docRoot));
   server.keepAliveTimeout = 10;
   server.listen({
-    port: 3000,
+    port: port || 3000,
     host: 'localhost',
   });
 

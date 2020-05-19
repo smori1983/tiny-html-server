@@ -18,7 +18,7 @@ const createApp = function createApp(docRoot) {
 
 /**
  * @param {string} docRoot
- * @param {number} [port]
+ * @param {number} port
  * @returns {module:http.Server}
  */
 const serve = function serve(docRoot, port) {

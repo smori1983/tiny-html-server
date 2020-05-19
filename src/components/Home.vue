@@ -16,8 +16,8 @@
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-btn v-on:click="startServer" class="mr-4">Start</v-btn>
-          <v-btn v-on:click="stopServer">Stop</v-btn>
+          <v-btn v-on:click="startServer" v-bind:disabled="startButtonDisabled()" color="light-green" class="mr-4">Start</v-btn>
+          <v-btn v-on:click="stopServer" v-bind:disabled="stopButtonDisabled()" color="amber">Stop</v-btn>
         </v-col>
       </v-row>
       <v-row>
@@ -58,6 +58,7 @@ export default {
   data: () => ({
     directory: '',
     port: '3000',
+    serverIsRunning: false,
     log: '',
   }),
   methods: {
@@ -79,14 +80,22 @@ export default {
     stopServer() {
       ipcRenderer.send('server-stop');
     },
+    startButtonDisabled() {
+      return this.serverIsRunning === true;
+    },
+    stopButtonDisabled() {
+      return this.serverIsRunning === false;
+    },
   },
   mounted() {
     // Temporary implementation
     ipcRenderer.on('server-started', () => {
+      this.serverIsRunning = true;
       this.log += 'started<br>';
     });
 
     ipcRenderer.on('server-stopped', () => {
+      this.serverIsRunning = false;
       this.log += 'stopped<br>';
     });
   },

@@ -101,9 +101,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.directory {
-  width: 300px;
-}
-</style>

@@ -20,9 +20,6 @@
           <v-btn v-on:click="stopServer" v-bind:disabled="stopButtonDisabled()" color="amber">Stop</v-btn>
         </v-col>
       </v-row>
-      <v-row>
-        <div v-html="log" class="log"></div>
-      </v-row>
     </v-container>
   </v-form>
 </template>
@@ -59,7 +56,6 @@ export default {
     directory: '',
     port: '3000',
     serverIsRunning: false,
-    log: '',
   }),
   methods: {
     selectDirectory() {
@@ -88,15 +84,11 @@ export default {
     },
   },
   mounted() {
-    // Temporary implementation
     ipcRenderer.on('server-started', () => {
       this.serverIsRunning = true;
-      this.log += 'started<br>';
     });
-
     ipcRenderer.on('server-stopped', () => {
       this.serverIsRunning = false;
-      this.log += 'stopped<br>';
     });
   },
 };

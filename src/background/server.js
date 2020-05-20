@@ -27,7 +27,7 @@ const serve = function serve(docRoot, port) {
   server.on('request', createApp(docRoot));
   server.keepAliveTimeout = 10;
   server.listen({
-    port: port || 3000,
+    port: port,
     host: 'localhost',
   });
 

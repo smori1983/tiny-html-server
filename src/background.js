@@ -98,9 +98,16 @@ ipcMain.on('server-start', (event, args) => {
     srv.close()
   }
 
-  srv = server.serve(args.directory, args.port)
-
-  event.sender.send('server-started')
+  server.serve(args.directory, args.port, (status, data) => {
+    if (status === 'ok') {
+      event.sender.send('server-started')
+      srv = data.server;
+    } else {
+      event.sender.send('server-error', {
+        code: data.code,
+      })
+    }
+  })
 })
 
 ipcMain.on('server-stop', (event) => {

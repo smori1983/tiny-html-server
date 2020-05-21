@@ -15,7 +15,12 @@ yargs.command({
     });
   },
   handler: function handler(argv) {
-    server.serve(argv.directory, argv.port);
+    server.serve(argv.directory, argv.port, function (status, data) {
+      if (status === 'error') {
+        console.log('Error:');
+        console.log(data.message);
+      }
+    });
   },
 });
 

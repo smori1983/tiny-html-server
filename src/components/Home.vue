@@ -20,6 +20,11 @@
           <v-btn v-on:click="stopServer" v-bind:disabled="stopButtonDisabled()" color="amber">Stop</v-btn>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col cols="12">
+          <div>{{ errorReason }}</div>
+        </v-col>
+      </v-row>
     </v-container>
   </v-form>
 </template>
@@ -56,6 +61,7 @@ export default {
     directory: '',
     port: '3000',
     serverIsRunning: false,
+    errorReason: '',
   }),
   methods: {
     selectDirectory() {
@@ -86,9 +92,15 @@ export default {
   mounted() {
     ipcRenderer.on('server-started', () => {
       this.serverIsRunning = true;
+      this.errorReason = '';
     });
     ipcRenderer.on('server-stopped', () => {
       this.serverIsRunning = false;
+      this.errorReason = '';
+    });
+    ipcRenderer.on('server-error', (event, args) => {
+      this.serverIsRunning = false;
+      this.errorReason = (args.code === 'EADDRINUSE') ? 'port is already used.' : 'unknown error.';
     });
   },
 };

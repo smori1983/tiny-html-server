@@ -1,9 +1,9 @@
 <template>
-  <v-form>
+  <v-form ref="form">
     <v-container>
       <v-row>
         <v-col cols="8">
-          <v-text-field v-model="directory" placeholder="directory"></v-text-field>
+          <v-text-field v-model="directory" v-bind:rules="rulesDirectory()" placeholder="directory"></v-text-field>
         </v-col>
         <v-col cols="4">
           <v-btn v-on:click="selectDirectory">Browse</v-btn>
@@ -11,18 +11,13 @@
       </v-row>
       <v-row>
         <v-col cols="4">
-          <v-text-field v-model="port" prefix="http://localhost:" suffix="/"></v-text-field>
+          <v-text-field v-model="port" v-bind:rules="rulesPort()" prefix="http://localhost:" suffix="/"></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
           <v-btn v-on:click="startServer" v-bind:disabled="startButtonDisabled()" color="light-green" class="mr-4">Start</v-btn>
           <v-btn v-on:click="stopServer" v-bind:disabled="stopButtonDisabled()" color="amber">Stop</v-btn>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <div>{{ errorReason }}</div>
         </v-col>
       </v-row>
     </v-container>
@@ -34,36 +29,43 @@ const fs = require('fs');
 const { ipcRenderer } = require('electron'); // eslint-disable-line
 const { dialog } = require('electron').remote; // eslint-disable-line
 
-/**
- * @param {string} directory
- * @param {string} port
- * @returns {boolean}
- */
-const validate = (directory, port) => {
-  const checkDirectory = (input) => {
-    try {
-      return input.length > 0 && fs.statSync(input).isDirectory();
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const checkPort = (input) => {
-    return (/^\d+$/.test(input)) && (80 <= input && input <= 65535)
-  };
-
-  return checkDirectory(directory) && checkPort(port);
-};
-
 export default {
   name: 'home',
   data: () => ({
     directory: '',
     port: '3000',
     serverIsRunning: false,
-    errorReason: '',
+    errorCode: '',
   }),
   methods: {
+    rulesDirectory() {
+      return [
+        (value) => {
+          return !!value || 'Required';
+        },
+        (value) => {
+          try {
+            return value.length > 0 && fs.statSync(value).isDirectory();
+          } catch (e) {
+            return 'Is not a directory';
+          }
+        },
+      ];
+    },
+    rulesPort() {
+      // const that = this;
+      return [
+        () => {
+          return this.errorCode === 'EADDRINUSE' ? 'Port is already used.' : true;
+        },
+        (value) => {
+          return !!value || 'Required';
+        },
+        (value) => {
+          return (/^\d+$/.test(value)) && (80 <= value && value <= 65535) || '80 - 65535';
+        },
+      ];
+    },
     selectDirectory() {
       dialog.showOpenDialog({
         properties: ['openDirectory'],
@@ -72,7 +74,8 @@ export default {
       });
     },
     startServer() {
-      if (validate(this.directory, this.port)) {
+      this.errorCode = '';
+      if (this.$refs.form.validate()) {
         ipcRenderer.send('server-start', {
           directory: this.directory,
           port: this.port,
@@ -92,15 +95,17 @@ export default {
   mounted() {
     ipcRenderer.on('server-started', () => {
       this.serverIsRunning = true;
-      this.errorReason = '';
+      this.errorCode = '';
     });
     ipcRenderer.on('server-stopped', () => {
       this.serverIsRunning = false;
-      this.errorReason = '';
+      this.errorCode = '';
     });
     ipcRenderer.on('server-error', (event, args) => {
+      // TODO: Handle unknown error (args.code !== 'EADDRINUSE')
       this.serverIsRunning = false;
-      this.errorReason = (args.code === 'EADDRINUSE') ? 'port is already used.' : 'unknown error.';
+      this.errorCode = args.code;
+      this.$refs.form.validate();
     });
   },
 };

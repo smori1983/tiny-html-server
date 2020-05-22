@@ -3,21 +3,41 @@
     <v-container>
       <v-row>
         <v-col cols="8">
-          <v-text-field v-model="directory" v-bind:rules="rulesDirectory()" placeholder="directory"></v-text-field>
+          <v-text-field
+            v-model="directory"
+            v-bind:rules="rulesDirectory()"
+            placeholder="directory"
+          ></v-text-field>
         </v-col>
         <v-col cols="4">
-          <v-btn v-on:click="selectDirectory">Browse</v-btn>
+          <v-btn
+            v-on:click="selectDirectory"
+          >Browse</v-btn>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="4">
-          <v-text-field v-model="port" v-bind:rules="rulesPort()" prefix="http://localhost:" suffix="/"></v-text-field>
+          <v-text-field
+            v-model="port"
+            v-bind:rules="rulesPort()"
+            prefix="http://localhost:"
+            suffix="/"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-btn v-on:click="startServer" v-bind:disabled="startButtonDisabled()" color="light-green" class="mr-4">Start</v-btn>
-          <v-btn v-on:click="stopServer" v-bind:disabled="stopButtonDisabled()" color="amber">Stop</v-btn>
+          <v-btn
+            v-on:click="startServer"
+            v-bind:disabled="startButtonDisabled()"
+            color="light-green"
+            class="mr-4"
+          >Start</v-btn>
+          <v-btn
+            v-on:click="stopServer"
+            v-bind:disabled="stopButtonDisabled()"
+            color="amber"
+          >Stop</v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -53,7 +73,6 @@ export default {
       ];
     },
     rulesPort() {
-      // const that = this;
       return [
         () => {
           return this.errorCode === 'EADDRINUSE' ? 'Port is already used.' : true;

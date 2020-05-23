@@ -1,29 +1,56 @@
 <template>
-  <v-form>
+  <v-form ref="form">
     <v-container>
       <v-row>
         <v-col cols="8">
-          <v-text-field v-model="directory" placeholder="directory"></v-text-field>
+          <v-text-field
+            v-model="directory"
+            v-bind:rules="rulesDirectory()"
+            placeholder="directory"
+          ></v-text-field>
         </v-col>
         <v-col cols="4">
-          <v-btn v-on:click="selectDirectory">Browse</v-btn>
+          <v-btn
+            v-on:click="selectDirectory"
+          >Browse</v-btn>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="4">
-          <v-text-field v-model="port" prefix="http://localhost" suffix="/"></v-text-field>
+          <v-text-field
+            v-model="port"
+            v-bind:rules="rulesPort()"
+            prefix="http://localhost:"
+            suffix="/"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-btn v-on:click="startServer" class="mr-4">Start</v-btn>
-          <v-btn v-on:click="stopServer">Stop</v-btn>
+          <v-btn
+            v-on:click="startServer"
+            v-bind:disabled="startButtonDisabled()"
+            color="light-green"
+            class="mr-4"
+          >Start</v-btn>
+          <v-btn
+            v-on:click="stopServer"
+            v-bind:disabled="stopButtonDisabled()"
+            color="amber"
+          >Stop</v-btn>
         </v-col>
       </v-row>
-      <v-row>
-        <div v-html="log" class="log"></div>
-      </v-row>
     </v-container>
+    <v-dialog
+      v-model="dialog"
+      max-width="300"
+    >
+      <v-card>
+        <v-card-title></v-card-title>
+        <v-card-text>Unknown error.</v-card-text>
+        <v-card-actions></v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-form>
 </template>
 
@@ -32,35 +59,43 @@ const fs = require('fs');
 const { ipcRenderer } = require('electron'); // eslint-disable-line
 const { dialog } = require('electron').remote; // eslint-disable-line
 
-/**
- * @param {string} directory
- * @param {string} port
- * @returns {boolean}
- */
-const validate = (directory, port) => {
-  const checkDirectory = (input) => {
-    try {
-      return input.length > 0 && fs.statSync(input).isDirectory();
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const checkPort = (input) => {
-    return (/^\d+$/.test(input)) && (80 <= input && input <= 65535)
-  };
-
-  return checkDirectory(directory) && checkPort(port);
-};
-
 export default {
   name: 'home',
   data: () => ({
+    dialog: false,
     directory: '',
     port: '3000',
-    log: '',
+    serverIsRunning: false,
+    errorCode: '',
   }),
   methods: {
+    rulesDirectory() {
+      return [
+        (value) => {
+          return !!value || 'Required';
+        },
+        (value) => {
+          try {
+            return value.length > 0 && fs.statSync(value).isDirectory();
+          } catch (e) {
+            return 'Is not a directory';
+          }
+        },
+      ];
+    },
+    rulesPort() {
+      return [
+        () => {
+          return this.errorCode === 'EADDRINUSE' ? 'Port is already used.' : true;
+        },
+        (value) => {
+          return !!value || 'Required';
+        },
+        (value) => {
+          return (/^\d+$/.test(value)) && (80 <= value && value <= 65535) || '80 - 65535';
+        },
+      ];
+    },
     selectDirectory() {
       dialog.showOpenDialog({
         properties: ['openDirectory'],
@@ -69,7 +104,8 @@ export default {
       });
     },
     startServer() {
-      if (validate(this.directory, this.port)) {
+      this.errorCode = '';
+      if (this.$refs.form.validate()) {
         ipcRenderer.send('server-start', {
           directory: this.directory,
           port: this.port,
@@ -79,22 +115,31 @@ export default {
     stopServer() {
       ipcRenderer.send('server-stop');
     },
+    startButtonDisabled() {
+      return this.serverIsRunning === true;
+    },
+    stopButtonDisabled() {
+      return this.serverIsRunning === false;
+    },
   },
   mounted() {
-    // Temporary implementation
     ipcRenderer.on('server-started', () => {
-      this.log += 'started<br>';
+      this.serverIsRunning = true;
+      this.errorCode = '';
     });
-
     ipcRenderer.on('server-stopped', () => {
-      this.log += 'stopped<br>';
+      this.serverIsRunning = false;
+      this.errorCode = '';
+    });
+    ipcRenderer.on('server-error', (event, args) => {
+      this.serverIsRunning = false;
+      this.errorCode = args.code;
+      this.$refs.form.validate();
+
+      if (args.code !== 'EADDRINUSE') {
+        this.dialog = true;
+      }
     });
   },
 };
 </script>
-
-<style>
-.directory {
-  width: 300px;
-}
-</style>

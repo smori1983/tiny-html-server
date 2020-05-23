@@ -6,7 +6,7 @@ const http = require('http');
  * @param {string} docRoot
  * @returns {Express}
  */
-const createApp = function createApp(docRoot) {
+const createApp = (docRoot) => {
   const app = express();
 
   app.use('/', express.static(fs.realpathSync(docRoot), {
@@ -17,21 +17,46 @@ const createApp = function createApp(docRoot) {
 };
 
 /**
+ * @typedef {Object} ServerResponseSuccess
+ * @property {module:http.Server} server
+ */
+
+/**
+ * @typedef {Object} ServerResponseFailure
+ * @property {string} code
+ * @property {string} message
+ */
+
+/**
+ * @callback ServerResponseCallback
+ * @param {string} status
+ * @param {(ServerResponseSuccess|ServerResponseFailure)} data
+ */
+
+/**
  * @param {string} docRoot
  * @param {number} port
- * @returns {module:http.Server}
+ * @param {ServerResponseCallback} cb
  */
-const serve = function serve(docRoot, port) {
+const serve = (docRoot, port, cb) => {
   const server = http.createServer();
 
-  server.on('request', createApp(docRoot));
   server.keepAliveTimeout = 10;
+  server.on('request', createApp(docRoot));
+  server.on('error', (e) => {
+    cb('error', {
+      code: e.code,
+      message: e.message,
+    });
+  });
   server.listen({
     port: port,
     host: 'localhost',
+  }, () => {
+    cb('ok', {
+      server: server,
+    });
   });
-
-  return server;
 };
 
 module.exports.serve = serve;

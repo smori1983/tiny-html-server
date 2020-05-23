@@ -41,6 +41,16 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-dialog
+      v-model="dialog"
+      max-width="300"
+    >
+      <v-card>
+        <v-card-title></v-card-title>
+        <v-card-text>Unknown error.</v-card-text>
+        <v-card-actions></v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-form>
 </template>
 
@@ -52,6 +62,7 @@ const { dialog } = require('electron').remote; // eslint-disable-line
 export default {
   name: 'home',
   data: () => ({
+    dialog: false,
     directory: '',
     port: '3000',
     serverIsRunning: false,
@@ -121,10 +132,13 @@ export default {
       this.errorCode = '';
     });
     ipcRenderer.on('server-error', (event, args) => {
-      // TODO: Handle unknown error (args.code !== 'EADDRINUSE')
       this.serverIsRunning = false;
       this.errorCode = args.code;
       this.$refs.form.validate();
+
+      if (args.code !== 'EADDRINUSE') {
+        this.dialog = true;
+      }
     });
   },
 };

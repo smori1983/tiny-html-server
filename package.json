@@ -23,6 +23,7 @@
     "connect-ssi": "^1.1.1",
     "core-js": "^3.6.4",
     "express": "^4.17.1",
+    "sprintf-js": "^1.1.2",
     "vue": "^2.6.11",
     "vuetify": "^2.2.11"
   },

@@ -102,10 +102,14 @@ ipcMain.on('server-start', (event, args) => {
     if (status === 'ok') {
       event.sender.send('server-started')
       srv = data.server;
-    } else {
+    } else if (status === 'error') {
       event.sender.send('server-error', {
         code: data.code,
       })
+    } else if (status === 'timeout') {
+      // Timeout caused by circular inclusion of SSI.
+      // There is no way but to quit app.
+      app.quit();
     }
   })
 })

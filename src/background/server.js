@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const http = require('http');
+const connectSSI = require('connect-ssi');
 
 /**
  * @param {string} docRoot
@@ -9,7 +10,17 @@ const http = require('http');
 const createApp = (docRoot) => {
   const app = express();
 
-  app.use('/', express.static(fs.realpathSync(docRoot), {
+  const docRootAbsPath = fs.realpathSync(docRoot);
+
+  // NOTE
+  // The option 'ext' is not the extension of included files.
+  // This is the default extension of express.static (DirectoryIndex).
+  app.use(connectSSI({
+    baseDir: docRootAbsPath,
+    ext: '.html',
+  }));
+
+  app.use('/', express.static(docRootAbsPath, {
     fallthrough: true,
   }));
 
@@ -28,9 +39,14 @@ const createApp = (docRoot) => {
  */
 
 /**
+ * @typedef {Object} ServerResponseTimeout
+ * @property {number} timeout millisecond
+ */
+
+/**
  * @callback ServerResponseCallback
  * @param {string} status
- * @param {(ServerResponseSuccess|ServerResponseFailure)} data
+ * @param {(ServerResponseSuccess|ServerResponseFailure|ServerResponseTimeout)} data
  */
 
 /**
@@ -39,9 +55,15 @@ const createApp = (docRoot) => {
  * @param {ServerResponseCallback} cb
  */
 const serve = (docRoot, port, cb) => {
+  const timeout = 3000;
   const server = http.createServer();
 
   server.keepAliveTimeout = 10;
+  server.setTimeout(timeout, function () {
+    cb('timeout', {
+      timeout: timeout,
+    });
+  });
   server.on('request', createApp(docRoot));
   server.on('error', (e) => {
     cb('error', {

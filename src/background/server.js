@@ -55,15 +55,15 @@ const createApp = (docRoot) => {
  * @param {ServerResponseCallback} cb
  */
 const serve = (docRoot, port, cb) => {
-  const timeout = 3000;
+  // const timeout = 3000;
   const server = http.createServer();
 
   server.keepAliveTimeout = 10;
-  server.setTimeout(timeout, function () {
-    cb('timeout', {
-      timeout: timeout,
-    });
-  });
+  // server.setTimeout(timeout, function () {
+  //   cb('timeout', {
+  //     timeout: timeout,
+  //   });
+  // });
   server.on('request', createApp(docRoot));
   server.on('error', (e) => {
     cb('error', {

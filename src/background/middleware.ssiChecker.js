@@ -24,15 +24,16 @@ const main = (rootDir) => {
     /** @type {SSIResultSet} result */
     const result = ssiUtil(rootDir, path);
 
-    if (result.error.length > 0) {
-      let errorMessage = '<div>Error, SSI circular inclusion:</div>';
-      result.error.forEach((errorCase) => {
-        errorMessage += '<div>' + errorCase.join(' -> ') + '</div>';
-      });
-      res.send(errorMessage);
-    } else {
+    if (result.error.length === 0) {
       next();
+      return;
     }
+
+    let errorMessage = '<div>Error, SSI circular inclusion:</div>';
+    result.error.forEach((errorCase) => {
+      errorMessage += '<div>' + errorCase.join(' -> ') + '</div>';
+    });
+    res.send(errorMessage);
   };
 };
 

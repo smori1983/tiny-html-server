@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const http = require('http');
 const connectSSI = require('connect-ssi');
+const ssiChecker = require('./middleware.ssiChecker');
 
 /**
  * @param {string} docRoot
@@ -11,6 +12,8 @@ const createApp = (docRoot) => {
   const app = express();
 
   const docRootAbsPath = fs.realpathSync(docRoot);
+
+  app.use(ssiChecker(docRootAbsPath));
 
   // NOTE
   // The option 'ext' is not the extension of included files.

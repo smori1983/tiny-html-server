@@ -22,7 +22,7 @@ const main = (rootDir) => {
     }
 
     /** @type {SSIResultSet} result */
-    const result = ssiUtil(rootDir, path);
+    const result = ssiUtil.checkCircularInclusion(rootDir, path);
 
     if (result.error.length === 0) {
       next();

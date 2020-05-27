@@ -52,7 +52,12 @@ const traverse = (rootDir, path, stack, result) => {
   }
 };
 
-const main = (rootDir, path) => {
+/**
+ * @param {string} rootDir
+ * @param {string} path
+ * @returns {SSIResultSet}
+ */
+const checkCircularInclusion = (rootDir, path) => {
   let result = {ok: [], error: []};
 
   traverse(rootDir, path, [path], result);
@@ -60,4 +65,4 @@ const main = (rootDir, path) => {
   return result;
 };
 
-module.exports = main;
+module.exports.checkCircularInclusion = checkCircularInclusion;

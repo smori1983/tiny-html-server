@@ -44,10 +44,11 @@ const main = (rootDir) => {
       return;
     }
 
-    let errorMessage = '<div>Error, SSI circular inclusion:</div>';
+    let errorMessage = sprintf('<div>%s</div>', escape('Error, SSI circular inclusion:'));
     result.error.forEach((errorCase) => {
-      errorMessage += '<div>' + errorCase.join(' -> ') + '</div>';
+      errorMessage += sprintf('<div>%s</div>', escape(errorCase.join(' -> ')));
     });
+
     res.send(errorMessage);
   };
 };

@@ -5,6 +5,13 @@ const connectSSI = require('connect-ssi');
 const ssiChecker = require('./middleware.ssiChecker');
 
 /**
+ * @callback middlewareCallback
+ * @param {e.Request} req
+ * @param {e.Response} res
+ * @param {e.NextFunction} next
+ */
+
+/**
  * @param {string} docRoot
  * @returns {Express}
  */

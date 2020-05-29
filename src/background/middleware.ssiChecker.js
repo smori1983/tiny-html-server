@@ -4,7 +4,7 @@ const ssiUtil = require('./util.ssi');
 
 /**
  * @param {string} rootDir
- * @returns {function}
+ * @returns {middlewareCallback}
  */
 const main = (rootDir) => {
   return (req, res, next) => {

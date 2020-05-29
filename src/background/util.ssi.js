@@ -38,12 +38,12 @@ const nextMatches = (absPath) => {
 
 /**
  * @param {string} rootDir
- * @param {string} path
+ * @param {string} reqPath
  * @param {string[]} stack
  * @param {SSIIncludeAttributeResultSet} result
  */
-const traverseForIncludeAttribute = (rootDir, path, stack, result) => {
-  const absPath = rootDir + path;
+const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
+  const absPath = rootDir + reqPath;
 
   const matches = nextMatches(absPath);
   if (matches.length > 0) {
@@ -55,7 +55,7 @@ const traverseForIncludeAttribute = (rootDir, path, stack, result) => {
       // Ignore circular inclusion cases.
       if (attribute === 'file') {
         result.error.push({
-          path: path,
+          path: reqPath,
           code: code,
         });
       } else if (stack.indexOf(next) < 0) {
@@ -69,12 +69,12 @@ const traverseForIncludeAttribute = (rootDir, path, stack, result) => {
 
 /**
  * @param {string} rootDir
- * @param {string} path
+ * @param {string} reqPath
  * @param {string[]} stack
  * @param {SSIResultSet} result
  */
-const traverseForCircularInclusion = (rootDir, path, stack, result) => {
-  const absPath = rootDir + path;
+const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
+  const absPath = rootDir + reqPath;
 
   const matches = nextMatches(absPath);
   if (matches.length > 0) {
@@ -90,32 +90,32 @@ const traverseForCircularInclusion = (rootDir, path, stack, result) => {
       }
     });
   } else {
-    result.ok.push(stack.concat(path));
+    result.ok.push(stack.concat(reqPath));
   }
 };
 
 /**
  * @param {string} rootDir
- * @param {string} path
+ * @param {string} reqPath
  * @returns {SSIIncludeAttributeResultSet}
  */
-const checkIncludeAttribute = (rootDir, path) => {
+const checkIncludeAttribute = (rootDir, reqPath) => {
   let result = {error: []};
 
-  traverseForIncludeAttribute(rootDir, path, [path], result);
+  traverseForIncludeAttribute(rootDir, reqPath, [reqPath], result);
 
   return result;
 };
 
 /**
  * @param {string} rootDir
- * @param {string} path
+ * @param {string} reqPath
  * @returns {SSIResultSet}
  */
-const checkCircularInclusion = (rootDir, path) => {
+const checkCircularInclusion = (rootDir, reqPath) => {
   let result = {ok: [], error: []};
 
-  traverseForCircularInclusion(rootDir, path, [path], result);
+  traverseForCircularInclusion(rootDir, reqPath, [reqPath], result);
 
   return result;
 };

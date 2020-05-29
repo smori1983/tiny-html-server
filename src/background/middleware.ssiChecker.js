@@ -13,18 +13,18 @@ const main = (rootDir) => {
       return;
     }
 
-    let path = req.path;
-    if (/\/$/.test(path)) {
-      path += 'index.html';
+    let reqPath = req.path;
+    if (/\/$/.test(reqPath)) {
+      reqPath += 'index.html';
     }
 
-    if (!/\.html$/.test(path)) {
+    if (!/\.html$/.test(reqPath)) {
       next();
       return;
     }
 
     /** @type {SSIIncludeAttributeResultSet} resultAttribute */
-    const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, path);
+    const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, reqPath);
 
     if (resultAttribute.error.length > 0) {
       let errorMessage = sprintf('<div>%s</div>', escape('Error, \'file\' attribute is not supported for SSI:'));
@@ -37,7 +37,7 @@ const main = (rootDir) => {
     }
 
     /** @type {SSIResultSet} result */
-    const result = ssiUtil.checkCircularInclusion(rootDir, path);
+    const result = ssiUtil.checkCircularInclusion(rootDir, reqPath);
 
     if (result.error.length === 0) {
       next();

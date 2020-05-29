@@ -39,17 +39,17 @@ const main = (rootDir) => {
     /** @type {SSIResultSet} result */
     const result = ssiUtil.checkCircularInclusion(rootDir, reqPath);
 
-    if (result.error.length === 0) {
-      next();
+    if (result.error.length > 0) {
+      let errorMessage = sprintf('<div>%s</div>', escape('Error, SSI circular inclusion:'));
+      result.error.forEach((errorCase) => {
+        errorMessage += sprintf('<div>%s</div>', escape(errorCase.join(' -> ')));
+      });
+
+      res.send(errorMessage);
       return;
     }
 
-    let errorMessage = sprintf('<div>%s</div>', escape('Error, SSI circular inclusion:'));
-    result.error.forEach((errorCase) => {
-      errorMessage += sprintf('<div>%s</div>', escape(errorCase.join(' -> ')));
-    });
-
-    res.send(errorMessage);
+    next();
   };
 };
 

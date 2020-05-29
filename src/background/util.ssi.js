@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 // Copied from node-ssi and add 'g' flag.
 const includeFileReg = /<!--#\s*include\s+(file|virtual)=(['"])([^\r\n\s]+?)\2\s*(.*)-->/g;
@@ -17,6 +18,33 @@ const nextMatches = (absPath) => {
   }
 
   return result;
+};
+
+/**
+ * @param {string} reqPath
+ * @param {string} includePath
+ * @returns {string}
+ */
+const resolveIncludePath = (reqPath, includePath) => {
+  if (/^\//.test(includePath)) {
+    return includePath;
+  } else {
+    return path.resolve(path.dirname(reqPath), includePath);
+  }
+};
+
+/**
+ * @param {string} rootDir
+ * @param {string} path
+ * @returns {boolean}
+ */
+const isExistingFile = (rootDir, path) => {
+  try {
+    fs.statSync(rootDir + path);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
 /**
@@ -50,7 +78,7 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
     matches.forEach((match) => {
       const code = match[0];
       const attribute = match[1];
-      const next = match[3];
+      const next = resolveIncludePath(reqPath, match[3]);
 
       // Ignore circular inclusion cases.
       if (attribute === 'file') {
@@ -58,7 +86,7 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
           path: reqPath,
           code: code,
         });
-      } else if (stack.indexOf(next) < 0) {
+      } else if (isExistingFile(rootDir, next) && stack.indexOf(next) < 0) {
         stack.push(next);
         traverseForIncludeAttribute(rootDir, next, stack, result);
         stack.pop();
@@ -79,11 +107,11 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
   const matches = nextMatches(absPath);
   if (matches.length > 0) {
     matches.forEach((match) => {
-      const next = match[3];
+      const next = resolveIncludePath(reqPath, match[3]);
 
       if (stack.indexOf(next) >= 0) {
         result.error.push(stack.concat(next));
-      } else {
+      } else if (isExistingFile(rootDir, next)) {
         stack.push(next);
         traverseForCircularInclusion(rootDir, next, stack, result);
         stack.pop();

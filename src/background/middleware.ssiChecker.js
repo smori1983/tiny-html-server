@@ -23,7 +23,7 @@ const main = (rootDir) => {
       return;
     }
 
-    /** @type {SSIIncludeAttributeResultSet} resultAttribute */
+    /** @type {SSIAttributeResultSet} resultAttribute */
     const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, reqPath);
 
     if (resultAttribute.error.length > 0) {

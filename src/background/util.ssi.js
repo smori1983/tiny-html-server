@@ -48,12 +48,12 @@ const isExistingFile = (rootDir, path) => {
 };
 
 /**
- * @typedef {Object} SSIIncludeAttributeResultSet
- * @property {SSIIncludeAttributeErrorItem[]} error
+ * @typedef {Object} SSIAttributeResultSet
+ * @property {SSIAttributeErrorItem[]} error
  */
 
 /**
- * @typedef {Object} SSIIncludeAttributeErrorItem
+ * @typedef {Object} SSIAttributeErrorItem
  * @property {string} path
  * @property {string} code
  */
@@ -68,7 +68,7 @@ const isExistingFile = (rootDir, path) => {
  * @param {string} rootDir
  * @param {string} reqPath
  * @param {string[]} stack
- * @param {SSIIncludeAttributeResultSet} result
+ * @param {SSIAttributeResultSet} result
  */
 const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
@@ -125,7 +125,7 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
 /**
  * @param {string} rootDir
  * @param {string} reqPath
- * @returns {SSIIncludeAttributeResultSet}
+ * @returns {SSIAttributeResultSet}
  */
 const checkIncludeAttribute = (rootDir, reqPath) => {
   let result = {error: []};

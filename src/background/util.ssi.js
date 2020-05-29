@@ -73,7 +73,7 @@ const traverseForIncludeAttribute = (rootDir, path, stack, result) => {
  * @param {string[]} stack
  * @param {SSIResultSet} result
  */
-const traverse = (rootDir, path, stack, result) => {
+const traverseForCircularInclusion = (rootDir, path, stack, result) => {
   const absPath = rootDir + path;
 
   const matches = nextMatches(absPath);
@@ -85,7 +85,7 @@ const traverse = (rootDir, path, stack, result) => {
         result.error.push(stack.concat(next));
       } else {
         stack.push(next);
-        traverse(rootDir, next, stack, result);
+        traverseForCircularInclusion(rootDir, next, stack, result);
         stack.pop();
       }
     });
@@ -115,7 +115,7 @@ const checkIncludeAttribute = (rootDir, path) => {
 const checkCircularInclusion = (rootDir, path) => {
   let result = {ok: [], error: []};
 
-  traverse(rootDir, path, [path], result);
+  traverseForCircularInclusion(rootDir, path, [path], result);
 
   return result;
 };

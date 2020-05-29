@@ -20,10 +20,52 @@ const nextMatches = (absPath) => {
 };
 
 /**
+ * @typedef {Object} SSIIncludeAttributeResultSet
+ * @property {SSIIncludeAttributeErrorItem[]} error
+ */
+
+/**
+ * @typedef {Object} SSIIncludeAttributeErrorItem
+ * @property {string} path
+ * @property {string} code
+ */
+
+/**
  * @typedef SSIResultSet
  * @property {string[][]} ok
  * @property {string[][]} error
  */
+
+/**
+ * @param {string} rootDir
+ * @param {string} path
+ * @param {string[]} stack
+ * @param {SSIIncludeAttributeResultSet} result
+ */
+const traverseForIncludeAttribute = (rootDir, path, stack, result) => {
+  const absPath = rootDir + path;
+
+  const matches = nextMatches(absPath);
+  if (matches.length > 0) {
+    matches.forEach((match) => {
+      const code = match[0];
+      const attribute = match[1];
+      const next = match[3];
+
+      // Ignore circular inclusion cases.
+      if (attribute === 'file') {
+        result.error.push({
+          path: path,
+          code: code,
+        });
+      } else if (stack.indexOf(next) < 0) {
+        stack.push(next);
+        traverseForIncludeAttribute(rootDir, next, stack, result);
+        stack.pop();
+      }
+    });
+  }
+};
 
 /**
  * @param {string} rootDir
@@ -55,6 +97,19 @@ const traverse = (rootDir, path, stack, result) => {
 /**
  * @param {string} rootDir
  * @param {string} path
+ * @returns {SSIIncludeAttributeResultSet}
+ */
+const checkIncludeAttribute = (rootDir, path) => {
+  let result = {error: []};
+
+  traverseForIncludeAttribute(rootDir, path, [path], result);
+
+  return result;
+};
+
+/**
+ * @param {string} rootDir
+ * @param {string} path
  * @returns {SSIResultSet}
  */
 const checkCircularInclusion = (rootDir, path) => {
@@ -65,4 +120,5 @@ const checkCircularInclusion = (rootDir, path) => {
   return result;
 };
 
+module.exports.checkIncludeAttribute = checkIncludeAttribute;
 module.exports.checkCircularInclusion = checkCircularInclusion;

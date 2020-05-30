@@ -1,0 +1,13 @@
+<html>
+<head>
+</head>
+<body>
+    <div>Error, SSI circular inclusion.</div>
+
+    <ul>
+        <% result.error.forEach ((item) => { %>
+        <li><%= item.join(' -> ') %></li>
+        <% }); %>
+    </ul>
+</body>
+</html>

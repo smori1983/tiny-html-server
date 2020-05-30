@@ -20,6 +20,9 @@ const createApp = (docRoot) => {
 
   const docRootAbsPath = fs.realpathSync(docRoot);
 
+  app.set('views', fs.realpathSync(__dirname + '/templates'));
+  app.set('view engine', 'ejs');
+
   app.use(ssiChecker.includeAttribute(docRootAbsPath));
   app.use(ssiChecker.circularInclusion(docRootAbsPath));
 

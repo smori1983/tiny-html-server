@@ -1,5 +1,3 @@
-const escape = require('escape-html');
-const sprintf = require('sprintf-js').sprintf;
 const ssiUtil = require('./util.ssi');
 
 /**

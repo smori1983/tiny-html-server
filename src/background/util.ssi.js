@@ -123,6 +123,14 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
 };
 
 /**
+ * @param {string} reqPath
+ * @returns {boolean}
+ */
+const canHandle = (reqPath) => {
+  return /\.html$/.test(reqPath);
+};
+
+/**
  * @param {string} rootDir
  * @param {string} reqPath
  * @returns {SSIAttributeResultSet}
@@ -130,7 +138,9 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
 const checkIncludeAttribute = (rootDir, reqPath) => {
   let result = {error: []};
 
-  traverseForIncludeAttribute(rootDir, reqPath, [reqPath], result);
+  if (canHandle(reqPath)) {
+    traverseForIncludeAttribute(rootDir, reqPath, [reqPath], result);
+  }
 
   return result;
 };
@@ -143,7 +153,9 @@ const checkIncludeAttribute = (rootDir, reqPath) => {
 const checkCircularInclusion = (rootDir, reqPath) => {
   let result = {ok: [], error: []};
 
-  traverseForCircularInclusion(rootDir, reqPath, [reqPath], result);
+  if (canHandle(reqPath)) {
+    traverseForCircularInclusion(rootDir, reqPath, [reqPath], result);
+  }
 
   return result;
 };

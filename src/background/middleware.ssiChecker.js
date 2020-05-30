@@ -29,11 +29,6 @@ const includeAttribute = (rootDir) => {
 
     const reqPath = prepareReqPath(req);
 
-    if (!/\.html$/.test(reqPath)) {
-      next();
-      return;
-    }
-
     /** @type {SSIAttributeResultSet} resultAttribute */
     const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, reqPath);
 
@@ -62,11 +57,6 @@ const circularInclusion = (rootDir) => {
     }
 
     const reqPath = prepareReqPath(req);
-
-    if (!/\.html$/.test(reqPath)) {
-      next();
-      return;
-    }
 
     /** @type {SSIResultSet} result */
     const result = ssiUtil.checkCircularInclusion(rootDir, reqPath);

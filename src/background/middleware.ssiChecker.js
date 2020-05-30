@@ -25,12 +25,12 @@ const includeAttribute = (rootDir) => {
       return;
     }
 
-    /** @type {SSIAttributeResultSet} resultAttribute */
-    const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
+    /** @type {SSIAttributeResultSet} result */
+    const result = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
 
-    if (resultAttribute.error.length > 0) {
+    if (result.error.length > 0) {
       res.render('include_attribute.ejs', {
-        result: resultAttribute,
+        result: result,
       });
     } else {
       next();

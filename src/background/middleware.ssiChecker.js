@@ -6,8 +6,8 @@ const ssiUtil = require('./util.ssi');
  * @param {string} rootDir
  * @returns {middlewareCallback}
  */
-const main = (rootDir) => {
-  return (req, res, next) => {
+const includeAttribute = (rootDir) => {
+  return function (req, res, next) {
     if (req.method !== 'GET') {
       next();
       return;
@@ -33,6 +33,30 @@ const main = (rootDir) => {
       });
 
       res.send(errorMessage);
+    } else {
+      next();
+    }
+  };
+};
+
+/**
+ * @param {string} rootDir
+ * @returns {middlewareCallback}
+ */
+const circularInclusion = (rootDir) => {
+  return function (req, res, next) {
+    if (req.method !== 'GET') {
+      next();
+      return;
+    }
+
+    let reqPath = req.path;
+    if (/\/$/.test(reqPath)) {
+      reqPath += 'index.html';
+    }
+
+    if (!/\.html$/.test(reqPath)) {
+      next();
       return;
     }
 
@@ -46,11 +70,11 @@ const main = (rootDir) => {
       });
 
       res.send(errorMessage);
-      return;
+    } else {
+      next();
     }
-
-    next();
   };
 };
 
-module.exports = main;
+module.exports.includeAttribute = includeAttribute;
+module.exports.circularInclusion = circularInclusion;

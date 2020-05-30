@@ -20,7 +20,8 @@ const createApp = (docRoot) => {
 
   const docRootAbsPath = fs.realpathSync(docRoot);
 
-  app.use(ssiChecker(docRootAbsPath));
+  app.use(ssiChecker.includeAttribute(docRootAbsPath));
+  app.use(ssiChecker.circularInclusion(docRootAbsPath));
 
   // NOTE
   // The option 'ext' is not the extension of included files.

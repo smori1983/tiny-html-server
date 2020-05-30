@@ -3,6 +3,20 @@ const sprintf = require('sprintf-js').sprintf;
 const ssiUtil = require('./util.ssi');
 
 /**
+ * @param {e.Request} req
+ * @returns {string}
+ */
+const prepareReqPath = (req) => {
+  let result = req.path;
+
+  if (/\/$/.test(result)) {
+    result += 'index.html';
+  }
+
+  return result;
+};
+
+/**
  * @param {string} rootDir
  * @returns {middlewareCallback}
  */
@@ -13,10 +27,7 @@ const includeAttribute = (rootDir) => {
       return;
     }
 
-    let reqPath = req.path;
-    if (/\/$/.test(reqPath)) {
-      reqPath += 'index.html';
-    }
+    const reqPath = prepareReqPath(req);
 
     if (!/\.html$/.test(reqPath)) {
       next();
@@ -50,10 +61,7 @@ const circularInclusion = (rootDir) => {
       return;
     }
 
-    let reqPath = req.path;
-    if (/\/$/.test(reqPath)) {
-      reqPath += 'index.html';
-    }
+    const reqPath = prepareReqPath(req);
 
     if (!/\.html$/.test(reqPath)) {
       next();

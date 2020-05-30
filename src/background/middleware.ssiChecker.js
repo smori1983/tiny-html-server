@@ -27,10 +27,8 @@ const includeAttribute = (rootDir) => {
       return;
     }
 
-    const reqPath = prepareReqPath(req);
-
     /** @type {SSIAttributeResultSet} resultAttribute */
-    const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, reqPath);
+    const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
 
     if (resultAttribute.error.length > 0) {
       let errorMessage = sprintf('<div>%s</div>', escape('Error, \'file\' attribute is not supported for SSI:'));
@@ -56,10 +54,8 @@ const circularInclusion = (rootDir) => {
       return;
     }
 
-    const reqPath = prepareReqPath(req);
-
     /** @type {SSIResultSet} result */
-    const result = ssiUtil.checkCircularInclusion(rootDir, reqPath);
+    const result = ssiUtil.checkCircularInclusion(rootDir, prepareReqPath(req));
 
     if (result.error.length > 0) {
       let errorMessage = sprintf('<div>%s</div>', escape('Error, SSI circular inclusion:'));

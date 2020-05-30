@@ -1,0 +1,13 @@
+<html>
+<head>
+</head>
+<body>
+    <div>Error, 'file' attribute is not supported for SSI.</div>
+
+    <ul>
+        <% result.error.forEach ((item) => { %>
+        <li><%= item.path %> (<%= item.code %>)</li>
+        <% }); %>
+    </ul>
+</body>
+</html>

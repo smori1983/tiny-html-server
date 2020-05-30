@@ -2,6 +2,14 @@ const express = require('express');
 const fs = require('fs');
 const http = require('http');
 const connectSSI = require('connect-ssi');
+const ssiChecker = require('./middleware.ssiChecker');
+
+/**
+ * @callback middlewareCallback
+ * @param {e.Request} req
+ * @param {e.Response} res
+ * @param {e.NextFunction} next
+ */
 
 /**
  * @param {string} docRoot
@@ -11,6 +19,12 @@ const createApp = (docRoot) => {
   const app = express();
 
   const docRootAbsPath = fs.realpathSync(docRoot);
+
+  app.set('views', fs.realpathSync(__dirname + '/templates'));
+  app.set('view engine', 'ejs');
+
+  app.use(ssiChecker.includeAttribute(docRootAbsPath));
+  app.use(ssiChecker.circularInclusion(docRootAbsPath));
 
   // NOTE
   // The option 'ext' is not the extension of included files.

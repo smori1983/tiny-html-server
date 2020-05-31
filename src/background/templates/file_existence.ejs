@@ -1,0 +1,14 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div>Error, SSI file(s) not found.</div>
+
+<ul>
+    <% result.error.forEach ((item) => { %>
+        <li><%= item.path %> (<%= item.code %>)</li>
+    <% }); %>
+</ul>
+</body>
+</html>

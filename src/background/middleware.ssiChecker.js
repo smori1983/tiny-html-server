@@ -21,7 +21,7 @@ const prepareReqPath = (req) => {
  */
 const includeAttribute = (rootDir) => {
   return getOnlyMiddleware((req, res, next) => {
-    /** @type {SSIAttributeResultSet} result */
+    /** @type {SSIAttributeResult} result */
     const result = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
 
     if (result.error.length > 0) {
@@ -40,7 +40,7 @@ const includeAttribute = (rootDir) => {
  */
 const circularInclusion = (rootDir) => {
   return getOnlyMiddleware((req, res, next) => {
-    /** @type {SSIResultSet} result */
+    /** @type {SSICircularInclusionResult} result */
     const result = ssiUtil.checkCircularInclusion(rootDir, prepareReqPath(req));
 
     if (result.error.length > 0) {
@@ -53,5 +53,25 @@ const circularInclusion = (rootDir) => {
   });
 };
 
+/**
+ * @param {string} rootDir
+ * @returns {middlewareCallback}
+ */
+const fileExistence = (rootDir) => {
+  return getOnlyMiddleware((req, res, next) => {
+    /** @type {SSIFileExistenceResult} result */
+    const result = ssiUtil.checkFileExistence(rootDir, prepareReqPath(req));
+
+    if (result.error.length > 0) {
+      res.render('file_existence.ejs', {
+        result: result,
+      })
+    } else {
+      next();
+    }
+  });
+};
+
 module.exports.includeAttribute = includeAttribute;
 module.exports.circularInclusion = circularInclusion;
+module.exports.fileExistence = fileExistence;

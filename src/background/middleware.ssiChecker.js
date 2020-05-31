@@ -1,12 +1,5 @@
+const getOnlyMiddleware = require('./util.middleware').getOnlyMiddleware;
 const ssiUtil = require('./util.ssi');
-
-/**
- * @param {e.Request} req
- * @returns {boolean}
- */
-const canHandle = (req) => {
-  return req.method === 'GET';
-};
 
 /**
  * @param {e.Request} req
@@ -27,12 +20,7 @@ const prepareReqPath = (req) => {
  * @returns {middlewareCallback}
  */
 const includeAttribute = (rootDir) => {
-  return function (req, res, next) {
-    if (!canHandle(req)) {
-      next();
-      return;
-    }
-
+  return getOnlyMiddleware((req, res, next) => {
     /** @type {SSIAttributeResultSet} result */
     const result = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
 
@@ -43,7 +31,7 @@ const includeAttribute = (rootDir) => {
     } else {
       next();
     }
-  };
+  });
 };
 
 /**
@@ -51,12 +39,7 @@ const includeAttribute = (rootDir) => {
  * @returns {middlewareCallback}
  */
 const circularInclusion = (rootDir) => {
-  return function (req, res, next) {
-    if (!canHandle(req)) {
-      next();
-      return;
-    }
-
+  return getOnlyMiddleware((req, res, next) => {
     /** @type {SSIResultSet} result */
     const result = ssiUtil.checkCircularInclusion(rootDir, prepareReqPath(req));
 
@@ -67,7 +50,7 @@ const circularInclusion = (rootDir) => {
     } else {
       next();
     }
-  };
+  });
 };
 
 module.exports.includeAttribute = includeAttribute;

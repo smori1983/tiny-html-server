@@ -21,7 +21,7 @@ const prepareReqPath = (req) => {
  */
 const includeAttribute = (rootDir) => {
   return getOnlyMiddleware((req, res, next) => {
-    /** @type {SSIAttributeResultSet} result */
+    /** @type {SSIAttributeResult} result */
     const result = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
 
     if (result.error.length > 0) {
@@ -40,7 +40,7 @@ const includeAttribute = (rootDir) => {
  */
 const circularInclusion = (rootDir) => {
   return getOnlyMiddleware((req, res, next) => {
-    /** @type {SSIResultSet} result */
+    /** @type {SSICircularInclusionResult} result */
     const result = ssiUtil.checkCircularInclusion(rootDir, prepareReqPath(req));
 
     if (result.error.length > 0) {
@@ -59,7 +59,7 @@ const circularInclusion = (rootDir) => {
  */
 const fileExistence = (rootDir) => {
   return getOnlyMiddleware((req, res, next) => {
-    /** @type {SSIFileExistenceResultSet} result */
+    /** @type {SSIFileExistenceResult} result */
     const result = ssiUtil.checkFileExistence(rootDir, prepareReqPath(req));
 
     if (result.error.length > 0) {

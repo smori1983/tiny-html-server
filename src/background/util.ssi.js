@@ -60,7 +60,7 @@ const isExistingFile = (rootDir, path) => {
 };
 
 /**
- * @typedef {Object} SSIAttributeResultSet
+ * @typedef {Object} SSIAttributeResult
  * @property {SSIAttributeErrorItem[]} error
  */
 
@@ -71,13 +71,13 @@ const isExistingFile = (rootDir, path) => {
  */
 
 /**
- * @typedef SSIResultSet
+ * @typedef SSICircularInclusionResult
  * @property {string[][]} ok
  * @property {string[][]} error
  */
 
 /**
- * @typedef SSIFileExistenceResultSet
+ * @typedef SSIFileExistenceResult
  * @property {SSIFileExistenceErrorItem[]} error
  */
 
@@ -91,7 +91,7 @@ const isExistingFile = (rootDir, path) => {
  * @param {string} rootDir
  * @param {string} reqPath
  * @param {string[]} stack
- * @param {SSIAttributeResultSet} result
+ * @param {SSIAttributeResult} result
  */
 const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
@@ -120,7 +120,7 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
  * @param {string} rootDir
  * @param {string} reqPath
  * @param {string[]} stack
- * @param {SSIResultSet} result
+ * @param {SSICircularInclusionResult} result
  */
 const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
@@ -147,7 +147,7 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
  * @param {string} rootDir
  * @param {string} reqPath
  * @param {string[]} stack
- * @param {SSIFileExistenceResultSet} result
+ * @param {SSIFileExistenceResult} result
  */
 const traverseForFileExistence = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
@@ -184,7 +184,7 @@ const canHandle = (reqPath) => {
 /**
  * @param {string} rootDir
  * @param {string} reqPath
- * @returns {SSIAttributeResultSet}
+ * @returns {SSIAttributeResult}
  */
 const checkIncludeAttribute = (rootDir, reqPath) => {
   let result = {error: []};
@@ -199,7 +199,7 @@ const checkIncludeAttribute = (rootDir, reqPath) => {
 /**
  * @param {string} rootDir
  * @param {string} reqPath
- * @returns {SSIResultSet}
+ * @returns {SSICircularInclusionResult}
  */
 const checkCircularInclusion = (rootDir, reqPath) => {
   let result = {ok: [], error: []};

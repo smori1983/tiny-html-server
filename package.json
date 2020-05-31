@@ -17,7 +17,8 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "test:background": "mocha test/background/*"
+    "test:background": "mocha test/background/*",
+    "watch:test:background": "watch 'npm run test:background' src/ test/ --interval=1 --ignoreDotFiles"
   },
   "main": "background.js",
   "dependencies": {

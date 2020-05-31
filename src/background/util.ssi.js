@@ -72,7 +72,6 @@ const isExistingFile = (rootDir, path) => {
 
 /**
  * @typedef SSICircularInclusionResult
- * @property {string[][]} ok
  * @property {string[][]} error
  */
 
@@ -138,8 +137,6 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
         stack.pop();
       }
     });
-  } else {
-    result.ok.push(stack.concat(reqPath));
   }
 };
 
@@ -202,7 +199,7 @@ const checkIncludeAttribute = (rootDir, reqPath) => {
  * @returns {SSICircularInclusionResult}
  */
 const checkCircularInclusion = (rootDir, reqPath) => {
-  let result = {ok: [], error: []};
+  let result = {error: []};
 
   if (canHandle(reqPath)) {
     traverseForCircularInclusion(rootDir, reqPath, [reqPath], result);

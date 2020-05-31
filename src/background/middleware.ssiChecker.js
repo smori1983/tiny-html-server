@@ -1,5 +1,4 @@
-const escape = require('escape-html');
-const sprintf = require('sprintf-js').sprintf;
+const getOnlyMiddleware = require('./util.middleware').getOnlyMiddleware;
 const ssiUtil = require('./util.ssi');
 
 /**
@@ -21,23 +20,18 @@ const prepareReqPath = (req) => {
  * @returns {middlewareCallback}
  */
 const includeAttribute = (rootDir) => {
-  return function (req, res, next) {
-    if (req.method !== 'GET') {
-      next();
-      return;
-    }
+  return getOnlyMiddleware((req, res, next) => {
+    /** @type {SSIAttributeResultSet} result */
+    const result = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
 
-    /** @type {SSIAttributeResultSet} resultAttribute */
-    const resultAttribute = ssiUtil.checkIncludeAttribute(rootDir, prepareReqPath(req));
-
-    if (resultAttribute.error.length > 0) {
+    if (result.error.length > 0) {
       res.render('include_attribute.ejs', {
-        result: resultAttribute,
+        result: result,
       });
     } else {
       next();
     }
-  };
+  });
 };
 
 /**
@@ -45,12 +39,7 @@ const includeAttribute = (rootDir) => {
  * @returns {middlewareCallback}
  */
 const circularInclusion = (rootDir) => {
-  return function (req, res, next) {
-    if (req.method !== 'GET') {
-      next();
-      return;
-    }
-
+  return getOnlyMiddleware((req, res, next) => {
     /** @type {SSIResultSet} result */
     const result = ssiUtil.checkCircularInclusion(rootDir, prepareReqPath(req));
 
@@ -61,7 +50,7 @@ const circularInclusion = (rootDir) => {
     } else {
       next();
     }
-  };
+  });
 };
 
 module.exports.includeAttribute = includeAttribute;

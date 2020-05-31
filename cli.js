@@ -1,6 +1,5 @@
 const yargs = require('yargs');
 const server = require('./src/background/server');
-const sprintf = require('sprintf-js').sprintf;
 
 yargs.command({
   command: ['serve <directory> <port>', '$0'],
@@ -20,10 +19,6 @@ yargs.command({
       if (status === 'error') {
         console.log('Error:');
         console.log(data.message);
-      }
-      if (status === 'timeout') {
-        console.log(sprintf('timeout: %d sec', data.timeout));
-        process.exit(1);
       }
     });
   },

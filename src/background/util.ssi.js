@@ -96,23 +96,21 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
   const matches = nextMatches(absPath);
 
-  if (matches.length > 0) {
-    matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match.path);
+  matches.forEach((match) => {
+    const next = resolveIncludePath(reqPath, match.path);
 
-      // Ignore circular inclusion cases.
-      if (match.attribute === 'file') {
-        result.error.push({
-          path: reqPath,
-          code: match.code,
-        });
-      } else if (isExistingFile(rootDir, next) && stack.indexOf(next) < 0) {
-        stack.push(next);
-        traverseForIncludeAttribute(rootDir, next, stack, result);
-        stack.pop();
-      }
-    });
-  }
+    // Ignore circular inclusion cases.
+    if (match.attribute === 'file') {
+      result.error.push({
+        path: reqPath,
+        code: match.code,
+      });
+    } else if (isExistingFile(rootDir, next) && stack.indexOf(next) < 0) {
+      stack.push(next);
+      traverseForIncludeAttribute(rootDir, next, stack, result);
+      stack.pop();
+    }
+  });
 };
 
 /**
@@ -125,19 +123,17 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
   const matches = nextMatches(absPath);
 
-  if (matches.length > 0) {
-    matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match.path);
+  matches.forEach((match) => {
+    const next = resolveIncludePath(reqPath, match.path);
 
-      if (stack.indexOf(next) >= 0) {
-        result.error.push(stack.concat(next));
-      } else if (isExistingFile(rootDir, next)) {
-        stack.push(next);
-        traverseForCircularInclusion(rootDir, next, stack, result);
-        stack.pop();
-      }
-    });
-  }
+    if (stack.indexOf(next) >= 0) {
+      result.error.push(stack.concat(next));
+    } else if (isExistingFile(rootDir, next)) {
+      stack.push(next);
+      traverseForCircularInclusion(rootDir, next, stack, result);
+      stack.pop();
+    }
+  });
 };
 
 /**
@@ -150,24 +146,22 @@ const traverseForFileExistence = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
   const matches = nextMatches(absPath);
 
-  if (matches.length > 0) {
-    matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match.path);
+  matches.forEach((match) => {
+    const next = resolveIncludePath(reqPath, match.path);
 
-      if (match.attribute === 'virtual' && stack.indexOf(next) < 0) {
-        if (isExistingFile(rootDir, next)) {
-          stack.push(next);
-          traverseForFileExistence(rootDir, next, stack, result);
-          stack.pop();
-        } else {
-          result.error.push({
-            path: reqPath,
-            code: match.code,
-          })
-        }
+    if (match.attribute === 'virtual' && stack.indexOf(next) < 0) {
+      if (isExistingFile(rootDir, next)) {
+        stack.push(next);
+        traverseForFileExistence(rootDir, next, stack, result);
+        stack.pop();
+      } else {
+        result.error.push({
+          path: reqPath,
+          code: match.code,
+        })
       }
-    });
-  }
+    }
+  });
 };
 
 /**

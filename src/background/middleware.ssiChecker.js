@@ -2,6 +2,14 @@ const ssiUtil = require('./util.ssi');
 
 /**
  * @param {e.Request} req
+ * @returns {boolean}
+ */
+const canHandle = (req) => {
+  return req.method === 'GET';
+};
+
+/**
+ * @param {e.Request} req
  * @returns {string}
  */
 const prepareReqPath = (req) => {
@@ -20,7 +28,7 @@ const prepareReqPath = (req) => {
  */
 const includeAttribute = (rootDir) => {
   return function (req, res, next) {
-    if (req.method !== 'GET') {
+    if (!canHandle(req)) {
       next();
       return;
     }
@@ -44,7 +52,7 @@ const includeAttribute = (rootDir) => {
  */
 const circularInclusion = (rootDir) => {
   return function (req, res, next) {
-    if (req.method !== 'GET') {
+    if (!canHandle(req)) {
       next();
       return;
     }

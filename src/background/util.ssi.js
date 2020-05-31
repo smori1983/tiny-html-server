@@ -211,6 +211,11 @@ const checkCircularInclusion = (rootDir, reqPath) => {
   return result;
 };
 
+/**
+ * @param {string} rootDir
+ * @param {string} reqPath
+ * @return {SSIFileExistenceResult}
+ */
 const checkFileExistence = (rootDir, reqPath) => {
   let result = {error: []};
 

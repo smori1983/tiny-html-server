@@ -5,16 +5,28 @@ const path = require('path');
 const includeFileReg = /<!--#\s*include\s+(file|virtual)=(['"])([^\r\n\s]+?)\2\s*(.*)-->/g;
 
 /**
+ * @typedef {Object} SSIMatchedItem
+ * @property {string} code
+ * @property {string} attribute
+ * @property {string} path
+ */
+
+/**
  * @param {string} absPath
- * @returns {string[]}
+ * @returns {SSIMatchedItem[]}
  */
 const nextMatches = (absPath) => {
   const content = fs.readFileSync(absPath).toString();
 
+  /** @type {SSIMatchedItem[]} result */
   let result = [];
   let matchResult;
   while ((matchResult = includeFileReg.exec(content))) {
-    result.push(matchResult);
+    result.push({
+      code: matchResult[0],
+      attribute: matchResult[1],
+      path: matchResult[3],
+    });
   }
 
   return result;
@@ -72,19 +84,17 @@ const isExistingFile = (rootDir, path) => {
  */
 const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-
   const matches = nextMatches(absPath);
+
   if (matches.length > 0) {
     matches.forEach((match) => {
-      const code = match[0];
-      const attribute = match[1];
-      const next = resolveIncludePath(reqPath, match[3]);
+      const next = resolveIncludePath(reqPath, match.path);
 
       // Ignore circular inclusion cases.
-      if (attribute === 'file') {
+      if (match.attribute === 'file') {
         result.error.push({
           path: reqPath,
-          code: code,
+          code: match.code,
         });
       } else if (isExistingFile(rootDir, next) && stack.indexOf(next) < 0) {
         stack.push(next);
@@ -103,11 +113,11 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
  */
 const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-
   const matches = nextMatches(absPath);
+
   if (matches.length > 0) {
     matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match[3]);
+      const next = resolveIncludePath(reqPath, match.path);
 
       if (stack.indexOf(next) >= 0) {
         result.error.push(stack.concat(next));

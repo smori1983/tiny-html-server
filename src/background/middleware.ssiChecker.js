@@ -53,5 +53,25 @@ const circularInclusion = (rootDir) => {
   });
 };
 
+/**
+ * @param {string} rootDir
+ * @returns {middlewareCallback}
+ */
+const fileExistence = (rootDir) => {
+  return getOnlyMiddleware((req, res, next) => {
+    /** @type {SSIFileExistenceResultSet} result */
+    const result = ssiUtil.checkFileExistence(rootDir, prepareReqPath(req));
+
+    if (result.error.length > 0) {
+      res.render('file_existence.ejs', {
+        result: result,
+      })
+    } else {
+      next();
+    }
+  });
+};
+
 module.exports.includeAttribute = includeAttribute;
 module.exports.circularInclusion = circularInclusion;
+module.exports.fileExistence = fileExistence;

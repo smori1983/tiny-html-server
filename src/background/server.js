@@ -25,6 +25,7 @@ const createApp = (docRoot) => {
 
   app.use(ssiChecker.includeAttribute(docRootAbsPath));
   app.use(ssiChecker.circularInclusion(docRootAbsPath));
+  app.use(ssiChecker.fileExistence(docRootAbsPath));
 
   // NOTE
   // The option 'ext' is not the extension of included files.

@@ -77,6 +77,17 @@ const isExistingFile = (rootDir, path) => {
  */
 
 /**
+ * @typedef SSIFileExistenceResultSet
+ * @property {SSIFileExistenceErrorItem[]} error
+ */
+
+/**
+ * @typedef {Object} SSIFileExistenceErrorItem
+ * @property {string} path
+ * @property {string} code
+ */
+
+/**
  * @param {string} rootDir
  * @param {string} reqPath
  * @param {string[]} stack
@@ -133,6 +144,36 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
 };
 
 /**
+ * @param {string} rootDir
+ * @param {string} reqPath
+ * @param {string[]} stack
+ * @param {SSIFileExistenceResultSet} result
+ */
+const traverseForFileExistence = (rootDir, reqPath, stack, result) => {
+  const absPath = rootDir + reqPath;
+  const matches = nextMatches(absPath);
+
+  if (matches.length > 0) {
+    matches.forEach((match) => {
+      const next = resolveIncludePath(reqPath, match.path);
+
+      if (match.attribute === 'virtual' && stack.indexOf(next) < 0) {
+        if (isExistingFile(rootDir, next)) {
+          stack.push(next);
+          traverseForFileExistence(rootDir, next, stack, result);
+          stack.pop();
+        } else {
+          result.error.push({
+            path: reqPath,
+            code: match.code,
+          })
+        }
+      }
+    });
+  }
+};
+
+/**
  * @param {string} reqPath
  * @returns {boolean}
  */
@@ -170,5 +211,16 @@ const checkCircularInclusion = (rootDir, reqPath) => {
   return result;
 };
 
+const checkFileExistence = (rootDir, reqPath) => {
+  let result = {error: []};
+
+  if (canHandle(reqPath)) {
+    traverseForFileExistence(rootDir, reqPath, [reqPath], result);
+  }
+
+  return result;
+};
+
 module.exports.checkIncludeAttribute = checkIncludeAttribute;
 module.exports.checkCircularInclusion = checkCircularInclusion;
+module.exports.checkFileExistence = checkFileExistence;

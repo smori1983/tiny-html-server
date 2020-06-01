@@ -72,7 +72,6 @@ const isExistingFile = (rootDir, path) => {
 
 /**
  * @typedef SSICircularInclusionResult
- * @property {string[][]} ok
  * @property {string[][]} error
  */
 
@@ -95,25 +94,25 @@ const isExistingFile = (rootDir, path) => {
  */
 const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-  const matches = nextMatches(absPath);
 
-  if (matches.length > 0) {
-    matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match.path);
+  nextMatches(absPath).forEach((match) => {
+    const next = resolveIncludePath(reqPath, match.path);
 
-      // Ignore circular inclusion cases.
-      if (match.attribute === 'file') {
-        result.error.push({
-          path: reqPath,
-          code: match.code,
-        });
-      } else if (isExistingFile(rootDir, next) && stack.indexOf(next) < 0) {
-        stack.push(next);
-        traverseForIncludeAttribute(rootDir, next, stack, result);
-        stack.pop();
+    if (match.attribute === 'virtual') {
+      if (stack.indexOf(next) < 0) {
+        if (isExistingFile(rootDir, next)) {
+          stack.push(next);
+          traverseForIncludeAttribute(rootDir, next, stack, result);
+          stack.pop();
+        }
       }
-    });
-  }
+    } else if (match.attribute === 'file') {
+      result.error.push({
+        path: reqPath,
+        code: match.code,
+      });
+    }
+  });
 };
 
 /**
@@ -124,23 +123,22 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
  */
 const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-  const matches = nextMatches(absPath);
 
-  if (matches.length > 0) {
-    matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match.path);
+  nextMatches(absPath).forEach((match) => {
+    const next = resolveIncludePath(reqPath, match.path);
 
-      if (stack.indexOf(next) >= 0) {
+    if (match.attribute === 'virtual') {
+      if (stack.indexOf(next) < 0) {
+        if (isExistingFile(rootDir, next)) {
+          stack.push(next);
+          traverseForCircularInclusion(rootDir, next, stack, result);
+          stack.pop();
+        }
+      } else {
         result.error.push(stack.concat(next));
-      } else if (isExistingFile(rootDir, next)) {
-        stack.push(next);
-        traverseForCircularInclusion(rootDir, next, stack, result);
-        stack.pop();
       }
-    });
-  } else {
-    result.ok.push(stack.concat(reqPath));
-  }
+    }
+  });
 };
 
 /**
@@ -151,13 +149,12 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
  */
 const traverseForFileExistence = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-  const matches = nextMatches(absPath);
 
-  if (matches.length > 0) {
-    matches.forEach((match) => {
-      const next = resolveIncludePath(reqPath, match.path);
+  nextMatches(absPath).forEach((match) => {
+    const next = resolveIncludePath(reqPath, match.path);
 
-      if (match.attribute === 'virtual' && stack.indexOf(next) < 0) {
+    if (match.attribute === 'virtual') {
+      if (stack.indexOf(next) < 0) {
         if (isExistingFile(rootDir, next)) {
           stack.push(next);
           traverseForFileExistence(rootDir, next, stack, result);
@@ -169,8 +166,8 @@ const traverseForFileExistence = (rootDir, reqPath, stack, result) => {
           })
         }
       }
-    });
-  }
+    }
+  });
 };
 
 /**
@@ -202,7 +199,7 @@ const checkIncludeAttribute = (rootDir, reqPath) => {
  * @returns {SSICircularInclusionResult}
  */
 const checkCircularInclusion = (rootDir, reqPath) => {
-  let result = {ok: [], error: []};
+  let result = {error: []};
 
   if (canHandle(reqPath)) {
     traverseForCircularInclusion(rootDir, reqPath, [reqPath], result);
@@ -211,6 +208,11 @@ const checkCircularInclusion = (rootDir, reqPath) => {
   return result;
 };
 
+/**
+ * @param {string} rootDir
+ * @param {string} reqPath
+ * @return {SSIFileExistenceResult}
+ */
 const checkFileExistence = (rootDir, reqPath) => {
   let result = {error: []};
 

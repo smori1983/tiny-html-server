@@ -5,56 +5,35 @@ const SUT = require('../../src/background/util.ssi');
 
 describe('background.util.ssi', () => {
   describe('checkIncludeAttribute', () => {
-    it('virtual attribute - absolute path', () => {
+    given([
+      {reqPath: '/index_09_fayy.html', code: '<!--#include file="/ssi/ssi_02.html" -->'},
+      {reqPath: '/index_10_fayn.html', code: '<!--#include file="/ssi/ssi_01.html" -->'},
+      {reqPath: '/index_11_fany.html', code: '<!--#include file="/ssi_02.html" -->'},
+      {reqPath: '/index_12_fann.html', code: '<!--#include file="/ssi_01.html" -->'},
+      {reqPath: '/index_13_fryy.html', code: '<!--#include file="ssi/ssi_02.html" -->'},
+      {reqPath: '/index_14_fryn.html', code: '<!--#include file="ssi/ssi_01.html" -->'},
+      {reqPath: '/index_15_frny.html', code: '<!--#include file="ssi_02.html" -->'},
+      {reqPath: '/index_16_frnn.html', code: '<!--#include file="ssi_01.html" -->'},
+    ]).it('error pattern', (arg) => {
       const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_100.html';
 
-      const result = SUT.checkIncludeAttribute(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 0);
-    });
-
-    it('virtual attribute - relative path', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_101.html';
-
-      const result = SUT.checkIncludeAttribute(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 0);
-    });
-
-    it('file attribute - absolute path', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_102.html';
-
-      const result = SUT.checkIncludeAttribute(rootDir, reqPath);
+      const result = SUT.checkIncludeAttribute(rootDir, arg.reqPath);
 
       assert.strictEqual(result.error.length, 1);
-      assert.strictEqual(result.error[0].path, '/index_102.html');
-      assert.strictEqual(result.error[0].code, '<!--#include file="/ssi/ssi_01.html" -->');
-    });
-
-    it('file attribute - relative path', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_103.html';
-
-      const result = SUT.checkIncludeAttribute(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 1);
-      assert.strictEqual(result.error[0].path, '/index_103.html');
-      assert.strictEqual(result.error[0].code, '<!--#include file="ssi/ssi_01.html" -->');
+      assert.strictEqual(result.error[0].code, arg.code);
     });
 
     given([
-      {reqPath: '/index_200.html'},
-      {reqPath: '/index_201.html'},
-      {reqPath: '/index_202.html'},
-      {reqPath: '/index_203.html'},
-      {reqPath: '/index_300.html'},
-      {reqPath: '/index_301.html'},
-      {reqPath: '/index_302.html'},
-      {reqPath: '/index_303.html'},
-    ]).it('ok patterns', (arg) => {
+      {reqPath: '/index_00_zzzz.html'},
+      {reqPath: '/index_01_vayy.html'},
+      {reqPath: '/index_02_vayn.html'},
+      {reqPath: '/index_03_vany.html'},
+      {reqPath: '/index_04_vann.html'},
+      {reqPath: '/index_05_vryy.html'},
+      {reqPath: '/index_06_vryn.html'},
+      {reqPath: '/index_07_vrny.html'},
+      {reqPath: '/index_08_vrnn.html'},
+    ]).it('ok pattern', (arg) => {
       const rootDir = __dirname + '/../background_resource/dir_01';
 
       const result = SUT.checkIncludeAttribute(rootDir, arg.reqPath);
@@ -64,59 +43,51 @@ describe('background.util.ssi', () => {
   });
 
   describe('checkCircularInclusion', () => {
-    it('no SSI', () => {
+    given([
+      {
+        reqPath: '/index_01_vayy.html',
+        error: [
+          '/index_01_vayy.html',
+          '/ssi/ssi_02.html',
+          '/ssi/ssi_03.html',
+          '/ssi/ssi_02.html',
+        ],
+      },
+      {
+        reqPath: '/index_05_vryy.html',
+        error: [
+          '/index_05_vryy.html',
+          '/ssi/ssi_02.html',
+          '/ssi/ssi_03.html',
+          '/ssi/ssi_02.html',
+        ],
+      },
+    ]).it('error pattern', (arg) => {
       const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_200.html';
 
-      const result = SUT.checkCircularInclusion(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 0);
-    });
-
-    it('valid SSI', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_201.html';
-
-      const result = SUT.checkCircularInclusion(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 0);
-    });
-
-    it('1 circular inclusion', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_202.html';
-
-      const result = SUT.checkCircularInclusion(rootDir, reqPath);
+      const result = SUT.checkCircularInclusion(rootDir, arg.reqPath);
 
       assert.strictEqual(result.error.length, 1);
-      assert.deepStrictEqual(result.error, [
-        ['/index_202.html', '/ssi/ssi_02.html', '/ssi/ssi_03.html', '/ssi/ssi_02.html'],
-      ]);
-    });
-
-    it('2 circular inclusions', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_203.html';
-
-      const result = SUT.checkCircularInclusion(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 2);
-      assert.deepStrictEqual(result.error, [
-        ['/index_203.html', '/ssi/ssi_02.html', '/ssi/ssi_03.html', '/ssi/ssi_02.html'],
-        ['/index_203.html', '/ssi/ssi_03.html', '/ssi/ssi_02.html', '/ssi/ssi_03.html'],
-      ]);
+      assert.deepStrictEqual(result.error, [arg.error]);
     });
 
     given([
-      {reqPath: '/index_100.html'},
-      {reqPath: '/index_101.html'},
-      {reqPath: '/index_102.html'},
-      {reqPath: '/index_103.html'},
-      {reqPath: '/index_300.html'},
-      {reqPath: '/index_301.html'},
-      {reqPath: '/index_302.html'},
-      {reqPath: '/index_303.html'},
-    ]).it('ok patterns', (arg) => {
+      {reqPath: '/index_00_zzzz.html'},
+      {reqPath: '/index_02_vayn.html'},
+      {reqPath: '/index_03_vany.html'},
+      {reqPath: '/index_04_vann.html'},
+      {reqPath: '/index_06_vryn.html'},
+      {reqPath: '/index_07_vrny.html'},
+      {reqPath: '/index_08_vrnn.html'},
+      {reqPath: '/index_09_fayy.html'},
+      {reqPath: '/index_10_fayn.html'},
+      {reqPath: '/index_11_fany.html'},
+      {reqPath: '/index_12_fann.html'},
+      {reqPath: '/index_13_fryy.html'},
+      {reqPath: '/index_14_fryn.html'},
+      {reqPath: '/index_15_frny.html'},
+      {reqPath: '/index_16_frnn.html'},
+    ]).it('ok pattern', (arg) => {
       const rootDir = __dirname + '/../background_resource/dir_01';
 
       const result = SUT.checkCircularInclusion(rootDir, arg.reqPath);
@@ -126,57 +97,35 @@ describe('background.util.ssi', () => {
   });
 
   describe('checkFileExistence', () => {
-    it('no SSI', () => {
+    given([
+      {reqPath: '/index_03_vany.html', code: '<!--#include virtual="/ssi_02.html" -->'},
+      {reqPath: '/index_04_vann.html', code: '<!--#include virtual="/ssi_01.html" -->'},
+      {reqPath: '/index_07_vrny.html', code: '<!--#include virtual="ssi_02.html" -->'},
+      {reqPath: '/index_08_vrnn.html', code: '<!--#include virtual="ssi_01.html" -->'},
+    ]).it('error pattern', (arg) => {
       const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_300.html';
 
-      const result = SUT.checkFileExistence(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 0);
-    });
-
-    it('valid SSI', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_301.html';
-
-      const result = SUT.checkFileExistence(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 0);
-    });
-
-    it('1 invalid SSI', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_302.html';
-
-      const result = SUT.checkFileExistence(rootDir, reqPath);
+      const result = SUT.checkFileExistence(rootDir, arg.reqPath);
 
       assert.strictEqual(result.error.length, 1);
-      assert.strictEqual(result.error[0].path, '/index_302.html');
-      assert.strictEqual(result.error[0].code, '<!--#include virtual="/ssi/foo.html" -->');
-    });
-
-    it('2 invalid SSI', () => {
-      const rootDir = __dirname + '/../background_resource/dir_01';
-      const reqPath = '/index_303.html';
-
-      const result = SUT.checkFileExistence(rootDir, reqPath);
-
-      assert.strictEqual(result.error.length, 2);
-      assert.strictEqual(result.error[0].path, '/index_303.html');
-      assert.strictEqual(result.error[0].code, '<!--#include virtual="/ssi/foo.html" -->');
-      assert.strictEqual(result.error[1].path, '/index_303.html');
-      assert.strictEqual(result.error[1].code, '<!--#include virtual="/ssi/bar.html" -->');
+      assert.strictEqual(result.error[0].path, arg.reqPath);
+      assert.strictEqual(result.error[0].code, arg.code);
     });
 
     given([
-      {reqPath: '/index_100.html'},
-      {reqPath: '/index_101.html'},
-      {reqPath: '/index_102.html'},
-      {reqPath: '/index_103.html'},
-      {reqPath: '/index_200.html'},
-      {reqPath: '/index_201.html'},
-      {reqPath: '/index_202.html'},
-      {reqPath: '/index_203.html'},
+      {reqPath: '/index_00_zzzz.html'},
+      {reqPath: '/index_01_vayy.html'},
+      {reqPath: '/index_02_vayn.html'},
+      {reqPath: '/index_05_vryy.html'},
+      {reqPath: '/index_06_vryn.html'},
+      {reqPath: '/index_09_fayy.html'},
+      {reqPath: '/index_10_fayn.html'},
+      {reqPath: '/index_11_fany.html'},
+      {reqPath: '/index_12_fann.html'},
+      {reqPath: '/index_13_fryy.html'},
+      {reqPath: '/index_14_fryn.html'},
+      {reqPath: '/index_15_frny.html'},
+      {reqPath: '/index_16_frnn.html'},
     ]).it('ok patterns', (arg) => {
       const rootDir = __dirname + '/../background_resource/dir_01';
 

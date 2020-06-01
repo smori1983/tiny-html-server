@@ -1,4 +1,4 @@
-const { describe, it } = require('mocha');
+const { describe } = require('mocha');
 const { given } = require('mocha-testdata');
 const assert = require('assert');
 const SUT = require('../../src/background/util.ssi');

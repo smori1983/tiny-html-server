@@ -94,9 +94,8 @@ const isExistingFile = (rootDir, path) => {
  */
 const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-  const matches = nextMatches(absPath);
 
-  matches.forEach((match) => {
+  nextMatches(absPath).forEach((match) => {
     const next = resolveIncludePath(reqPath, match.path);
 
     // Ignore circular inclusion cases.
@@ -121,9 +120,8 @@ const traverseForIncludeAttribute = (rootDir, reqPath, stack, result) => {
  */
 const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-  const matches = nextMatches(absPath);
 
-  matches.forEach((match) => {
+  nextMatches(absPath).forEach((match) => {
     const next = resolveIncludePath(reqPath, match.path);
 
     if (stack.indexOf(next) >= 0) {
@@ -144,9 +142,8 @@ const traverseForCircularInclusion = (rootDir, reqPath, stack, result) => {
  */
 const traverseForFileExistence = (rootDir, reqPath, stack, result) => {
   const absPath = rootDir + reqPath;
-  const matches = nextMatches(absPath);
 
-  matches.forEach((match) => {
+  nextMatches(absPath).forEach((match) => {
     const next = resolveIncludePath(reqPath, match.path);
 
     if (match.attribute === 'virtual' && stack.indexOf(next) < 0) {
